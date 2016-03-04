@@ -52,7 +52,7 @@ def findWord(stringArray, coordinateArray, word):
     if not len(coords) == 0:
         return coords
     else:
-        return -1;
+        return [];
         
 def flatten2D(array):
     result = []
@@ -146,17 +146,21 @@ def solve(array, words):
     for word in words:
         coords = []
         value = findWord(east, eastCoords, word)
-        if not value == -1:
-            coords = value
+        for coord in value:
+            if not len(coord) == 0:
+                coords.append(coord)
         value = findWord(south, southCoords, word)
-        if not value == -1:
-            coords = value
+        for coord in value:
+            if not len(coord) == 0:
+                coords.append(coord)
         value = findWord(ne, neCoords, word)
-        if not value == -1:
-            coords = value
+        for coord in value:
+            if not len(coord) == 0:
+                coords.append(coord)
         value = findWord(se, seCoords, word)
-        if not value == -1:
-            coords = value
+        for coord in value:
+            if not len(coord) == 0:
+                coords.append(coord)
         if not len(coords) == 0:
             solution.append(coords)
         else:
@@ -247,7 +251,7 @@ def placeWord(coordinateArray, word, rows, columns, invalidCoords, puzzle):
                             return
         
 #Creates a word search with the a given array of words, rows, and columns
-def createPuzzle(words, rows, columns):
+def createPuzzle(words, rows, columns, challenge):
     while(True):
         puzzle = [['' for c in range(columns)] for r in range(rows)]
         #Iterate through each word
@@ -271,7 +275,13 @@ def createPuzzle(words, rows, columns):
         for i, row in enumerate(puzzle):
             for j, char in enumerate(row):
                 if char == '':
-                    puzzle[i][j] = random.choice(string.ascii_lowercase)
+                    if not challenge:
+                        puzzle[i][j] = random.choice(string.ascii_lowercase)
+                    else:
+                        letters = ''
+                        for word in words:
+                            letters += word
+                        puzzle[i][j] = random.choice(letters)
         solution = solve(puzzle, words)
         valid = True
         for coordList in solution:
@@ -288,6 +298,6 @@ def createPuzzle(words, rows, columns):
 array = [['1','2','3','4'],['5','6','7','8'],['9','0','1','2'],['3','4','5','6']]
 printArray(array)
 solve(array, ['34' , '307', 'a'])
-words = ["123", "456789", "reallylongword"]
-puzzle = createPuzzle(words, 15, 15)
+words = ["kayak"]
+puzzle = createPuzzle(words, 15, 15, True)
 printArray(puzzle)
