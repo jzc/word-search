@@ -162,6 +162,7 @@ def solve(array, words):
         else:
             solution.append(-1)    
         print word, coords
+    return solution
 
 #Pass the direction as string
 def passThrough(startingCoord, length, direction, intersection):
@@ -247,37 +248,46 @@ def placeWord(coordinateArray, word, rows, columns, invalidCoords, puzzle):
         
 #Creates a word search with the a given array of words, rows, and columns
 def createPuzzle(words, rows, columns):
-    
-    puzzle = [['' for c in range(columns)] for r in range(rows)]
-    #Iterate through each word
-    for word in words:
-        #Create a list of invalid coordinates, the word placed in the puzzle CANNOT pass through these.
-        invalidCoords = []
+    while(True):
+        puzzle = [['' for c in range(columns)] for r in range(rows)]
+        #Iterate through each word
+        for word in words:
+            #Create a list of invalid coordinates, the word placed in the puzzle CANNOT pass through these.
+            invalidCoords = []
+            for i, row in enumerate(puzzle):
+                for j, letter in enumerate(row):
+                    if not letter == '' and not letter in word:
+                        invalidCoords.append([i,j])
+            #Randomly cycle through coordinates in the puzzle and attempt to place the word
+            coordinateArray = []
+            for r in range(rows):
+                for c in range(columns):
+                    coordinateArray.append([r,c])
+            random.shuffle(coordinateArray)
+            for coord in invalidCoords:
+                coordinateArray.remove(coord)
+            placeWord(coordinateArray, word, rows, columns, invalidCoords, puzzle)
+        #Place random letters in the rest of the puzzle
         for i, row in enumerate(puzzle):
-            for j, letter in enumerate(row):
-                if not letter == '' and not letter in word:
-                    invalidCoords.append([i,j])
-        #Randomly cycle through coordinates in the puzzle and attempt to place the word
-        coordinateArray = []
-        for r in range(rows):
-            for c in range(columns):
-                coordinateArray.append([r,c])
-        random.shuffle(coordinateArray)
-        for coord in invalidCoords:
-            coordinateArray.remove(coord)
-        placeWord(coordinateArray, word, rows, columns, invalidCoords, puzzle)
-    #Place random letters in the rest of the puzzle
-    for i, row in enumerate(puzzle):
-        for j, char in enumerate(row):
-            if char == '':
-                puzzle[i][j] = random.choice(string.ascii_lowercase)
-    return puzzle
-            
+            for j, char in enumerate(row):
+                if char == '':
+                    puzzle[i][j] = random.choice(string.ascii_lowercase)
+        solution = solve(puzzle, words)
+        valid = True
+        for coordList in solution:
+            if coordList == -1:
+                valid = False
+                break
+            if not len(coordList) == 1:
+                valid = False
+                break
+        if valid:
+            break          
+    return puzzle         
                 
 array = [['1','2','3','4'],['5','6','7','8'],['9','0','1','2'],['3','4','5','6']]
 printArray(array)
-solve(array, ['50' , '307', '34'])
-words = ["123", "456789", "123456789012345"]
+solve(array, ['34' , '307', 'a'])
+words = ["123", "456789", "reallylongword"]
 puzzle = createPuzzle(words, 15, 15)
 printArray(puzzle)
-solve(puzzle, words)
