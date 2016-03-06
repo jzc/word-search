@@ -1,5 +1,7 @@
 import random     
 import string
+from optparse import OptionParser
+from optparse import OptionGroup
    
 def printArray(array):
     for r in array:
@@ -62,7 +64,7 @@ def flatten2D(array):
     return result
 
 #Array contains a 2d array with the grid of characters, words is an array with the strings to look for
-def solve(array, words):
+def solve(array, words, verbose):
 
     #These arrays contain the combined string of each direction
     rowCount = len(array)
@@ -141,8 +143,9 @@ def solve(array, words):
     se = flatten2D(se)
     seCoords = flatten2D(seCoords)
     
-    print "Solutions"
     solution = []
+    if verbose:
+        print "Solutions"
     for word in words:
         coords = []
         value = findWord(east, eastCoords, word)
@@ -165,7 +168,8 @@ def solve(array, words):
             solution.append(coords)
         else:
             solution.append(-1)    
-        print word, coords
+        if verbose:
+            print word, coords
     return solution
 
 #Pass the direction as string
@@ -251,7 +255,7 @@ def placeWord(coordinateArray, word, rows, columns, invalidCoords, puzzle):
                             return
         
 #Creates a word search with the a given array of words, rows, and columns
-def createPuzzle(words, rows, columns, challenge):
+def createPuzzle(words, rows, columns, challenge, verbose):
     while(True):
         puzzle = [['' for c in range(columns)] for r in range(rows)]
         #Iterate through each word
@@ -282,7 +286,7 @@ def createPuzzle(words, rows, columns, challenge):
                         for word in words:
                             letters += word
                         puzzle[i][j] = random.choice(letters)
-        solution = solve(puzzle, words)
+        solution = solve(puzzle, words, verbose)
         valid = True
         for coordList in solution:
             if coordList == -1:
@@ -293,11 +297,36 @@ def createPuzzle(words, rows, columns, challenge):
                 break
         if valid:
             break          
-    return puzzle         
-                
-array = [['1','2','3','4'],['5','6','7','8'],['9','0','1','2'],['3','4','5','6']]
-printArray(array)
-solve(array, ['34' , '307', 'a'])
-words = ["kayak"]
-puzzle = createPuzzle(words, 15, 15, True)
-printArray(puzzle)
+    return (puzzle, solution)         
+      
+def main():
+    parser = OptionParser(epilog="***Required option")
+    parser.add_option("-r", "--rows", help="***Number of rows in word search", dest='rows', metavar="ROWS", type="int")
+    parser.add_option("-c", "--columns", help="***Number of columns in word search", dest='columns', metavar="COLUMNS", type="int")
+    parser.add_option("-w", "--words", help="***File location of words or space seperated list of words, pass True if list, False if not", dest='words', metavar="WORDS", nargs=2)
+    parser.add_option("-o", "--output", help="File location of the output file", dest='output', metavar="OUTPUT") 
+    parser.add_option("-g", "--challenge", help="Make the word search only out of letters from the words", dest="challenge", action="store_false", default=False)
+    parser.add_option("-v", "--verbose", help="Print status messages", action="store_true", dest="verbose",default=False)
+    (options, args) = parser.parse_args()
+    mandatory = ['rows', 'columns', 'words']
+    for m in mandatory:
+        if not options.__dict__[m]:
+            print "Mandatory option is missing\n"
+            parser.print_help()
+            exit(-1)
+    if options.words[1].lower() == "true":
+        options.words = options.words[0].split()
+    else:
+        input = open(options.words[0], "r")
+        words = []
+        for line in input:
+            if not line == '':
+                words.append(line.split("\n")[0])
+        options.words = words
+        input.close()
+    puzzle = createPuzzle(options.words, options.rows, options.columns, options.challenge, options.verbose)    
+    printArray(puzzle[0])
+    
+
+if __name__ == "__main__":
+    main()
