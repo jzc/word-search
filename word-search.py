@@ -305,7 +305,7 @@ def main():
     parser.add_option("-c", "--columns", help="***Number of columns in word search", dest='columns', metavar="COLUMNS", type="int")
     parser.add_option("-w", "--words", help="***File location of words or space seperated list of words, pass True if list, False if not", dest='words', metavar="WORDS", nargs=2)
     parser.add_option("-o", "--output", help="File location of the output file", dest='output', metavar="OUTPUT") 
-    parser.add_option("-g", "--challenge", help="Make the word search only out of letters from the words", dest="challenge", action="store_false", default=False)
+    parser.add_option("-g", "--challenge", help="Make the word search only out of letters from the words", dest="challenge", action="store_true", default=False)
     parser.add_option("-v", "--verbose", help="Print status messages", action="store_true", dest="verbose",default=False)
     (options, args) = parser.parse_args()
     mandatory = ['rows', 'columns', 'words']
